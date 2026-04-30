@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mirai MV</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="mv">
+    <!-- 背景シーン -->
+    <div id="sceneVerse1" class="scene active" aria-hidden="true"></div>
+    <div id="sceneVerse2" class="scene" aria-hidden="true"></div>
+    <div id="sceneChorus" class="scene chorus-scene" aria-hidden="true"></div>
+
+    <!-- オーバーレイ -->
+    <div class="dark-overlay"></div>
+    <div class="light-overlay"></div>
+    <div class="noise"></div>
+    <div class="scanline"></div>
+    <div class="vignette"></div>
+    <div id="chorusFlash" class="chorus-flash"></div>
+
+    <!-- 歌詞 -->
+    <section class="lyrics">
+      <p id="prevLyric" class="prev-lyric"></p>
+
+      <div class="main-line">
+        <h1 id="mainLyric" class="main-lyric">Loading...</h1>
+      </div>
+
+      <p id="subLyric" class="sub-lyric"></p>
+    </section>
+
+    <!-- 最小UI -->
+    <div class="controls">
+      <button id="playButton" class="play-button">Play</button>
+      <div id="time" class="time">0.0s</div>
+    </div>
+
+    <!-- TextAlive用 -->
+    <div id="media" class="hidden-media"></div>
+  </main>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/textalive-app-api/dist/index.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
