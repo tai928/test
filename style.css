@@ -1,0 +1,444 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #050505;
+  --white: #f8f8f4;
+  --muted: rgba(248, 248, 244, 0.34);
+  --muted-2: rgba(248, 248, 244, 0.16);
+  --accent: #d7f0a8;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--white);
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    "MS Mincho",
+    "Courier New",
+    serif;
+}
+
+body {
+  letter-spacing: 0.03em;
+}
+
+.mv {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #050505;
+}
+
+/* 背景シーン */
+.scene {
+  position: absolute;
+  inset: -3%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.03);
+  filter: brightness(0.35) saturate(0.8);
+  transition:
+    opacity 1.1s ease,
+    transform 6s ease,
+    filter 0.8s ease;
+  animation: kenburns 16s ease-in-out infinite alternate;
+}
+
+.scene.active {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+#sceneVerse1 {
+  background-image: url("./assets/verse-1.jpg");
+}
+
+#sceneVerse2 {
+  background-image: url("./assets/verse-2.jpg");
+}
+
+#sceneChorus {
+  background-image: url("./assets/chorus.jpg");
+}
+
+.chorus-scene {
+  filter: brightness(0.65) saturate(1.05);
+}
+
+@keyframes kenburns {
+  from {
+    background-position: 48% 46%;
+  }
+  to {
+    background-position: 52% 54%;
+  }
+}
+
+/* オーバーレイ */
+.dark-overlay,
+.light-overlay,
+.noise,
+.scanline,
+.vignette,
+.chorus-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dark-overlay {
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.44) 0%,
+      rgba(0, 0, 0, 0.28) 45%,
+      rgba(0, 0, 0, 0.52) 100%
+    );
+  transition: opacity 0.8s ease;
+}
+
+.light-overlay {
+  z-index: 2;
+  opacity: 0.12;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,0.09), transparent 30%),
+    radial-gradient(circle at 70% 30%, rgba(215,240,168,0.08), transparent 20%);
+  transition: opacity 0.8s ease, filter 0.8s ease;
+  filter: blur(18px);
+}
+
+.noise {
+  z-index: 3;
+  opacity: 0.06;
+  mix-blend-mode: soft-light;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.scanline {
+  z-index: 3;
+  opacity: 0.14;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.024) 0px,
+      rgba(255, 255, 255, 0.024) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+}
+
+.vignette {
+  z-index: 4;
+  background:
+    radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.34) 72%, rgba(0, 0, 0, 0.72) 100%);
+  transition: opacity 0.8s ease;
+}
+
+.chorus-flash {
+  z-index: 6;
+  opacity: 0;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.34), rgba(255,255,255,0.08) 34%, transparent 58%);
+  mix-blend-mode: screen;
+}
+
+.chorus-flash.active {
+  animation: chorusFlash 0.7s ease;
+}
+
+@keyframes chorusFlash {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 歌詞 */
+.lyrics {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 10vh 9vw;
+}
+
+.prev-lyric,
+.main-line,
+.sub-lyric {
+  width: min(78vw, 1120px);
+  text-align: left;
+}
+
+.prev-lyric,
+.sub-lyric {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-height: 1.9;
+}
+
+.prev-lyric {
+  top: calc(50% - 170px);
+  color: var(--muted-2);
+  font-size: clamp(14px, 1.55vw, 22px);
+}
+
+.sub-lyric {
+  top: calc(50% + 140px);
+  color: var(--muted);
+  font-size: clamp(15px, 1.8vw, 25px);
+}
+
+.main-line {
+  position: relative;
+}
+
+.main-line::before {
+  content: "";
+  position: absolute;
+  left: -26px;
+  top: 0.4em;
+  width: 2px;
+  height: 1.3em;
+  background: rgba(248, 248, 244, 0.42);
+  box-shadow: 0 0 18px rgba(248, 248, 244, 0.14);
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+.main-lyric {
+  position: relative;
+  min-height: 2.1em;
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(30px, 5vw, 78px);
+  line-height: 1.78;
+  font-weight: 400;
+  letter-spacing: 0.035em;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.06),
+    0 0 26px rgba(255,255,255,0.02);
+  transition: text-shadow 0.5s ease, color 0.5s ease;
+}
+
+.main-lyric::after {
+  content: "";
+  display: inline-block;
+  width: 0.52em;
+  height: 1.14em;
+  margin-left: 0.12em;
+  vertical-align: -0.16em;
+  background: rgba(248, 248, 244, 0.92);
+  box-shadow: 0 0 16px rgba(248, 248, 244, 0.18);
+  animation: caretBlink 0.9s steps(1) infinite;
+}
+
+@keyframes caretBlink {
+  0%, 48% { opacity: 1; }
+  49%, 100% { opacity: 0; }
+}
+
+.main-lyric.line-in {
+  animation: lineIn 0.34s ease;
+}
+
+.prev-lyric.line-fade,
+.sub-lyric.line-fade {
+  animation: softFade 0.42s ease;
+}
+
+@keyframes lineIn {
+  0% {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes softFade {
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateX(-50%) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 最小UI */
+.controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  padding: 28px 34px;
+  pointer-events: none;
+}
+
+.play-button,
+.time {
+  pointer-events: auto;
+}
+
+.play-button {
+  appearance: none;
+  border: 1px solid rgba(248, 248, 244, 0.18);
+  background: rgba(248, 248, 244, 0.07);
+  color: var(--white);
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.play-button:hover {
+  background: rgba(248, 248, 244, 0.13);
+  border-color: rgba(248, 248, 244, 0.30);
+  transform: translateY(-1px);
+}
+
+.play-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.time {
+  min-width: 92px;
+  text-align: right;
+  color: rgba(248, 248, 244, 0.72);
+  font-family: "Courier New", monospace;
+  font-size: clamp(15px, 1.7vw, 23px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* ビート時 */
+body.beat #sceneVerse1.active,
+body.beat #sceneVerse2.active {
+  transform: scale(1.09);
+  filter: brightness(0.42) saturate(0.88);
+}
+
+body.beat .main-line::before {
+  background: rgba(215, 240, 168, 0.78);
+  box-shadow: 0 0 18px rgba(215, 240, 168, 0.16);
+}
+
+/* サビで一気に明るく */
+body.chorus #sceneChorus.active {
+  transform: scale(1.1);
+  filter: brightness(0.98) saturate(1.15);
+}
+
+body.chorus .dark-overlay {
+  opacity: 0.18;
+}
+
+body.chorus .light-overlay {
+  opacity: 0.42;
+  filter: blur(8px) brightness(1.2);
+}
+
+body.chorus .vignette {
+  opacity: 0.45;
+}
+
+body.chorus .main-line::before {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 18px rgba(255,255,255,0.22),
+    0 0 42px rgba(215,240,168,0.16);
+}
+
+body.chorus .main-lyric {
+  color: #ffffff;
+  text-shadow:
+    0 0 12px rgba(255,255,255,0.20),
+    0 0 34px rgba(255,255,255,0.14),
+    0 0 80px rgba(215,240,168,0.10);
+}
+
+body.chorus .sub-lyric {
+  color: rgba(255,255,255,0.54);
+}
+
+.hidden-media {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  left: -9999px;
+  top: -9999px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .lyrics {
+    padding: 8vh 8vw;
+  }
+
+  .prev-lyric,
+  .main-line,
+  .sub-lyric {
+    width: min(86vw, 1120px);
+  }
+
+  .prev-lyric {
+    top: calc(50% - 140px);
+  }
+
+  .sub-lyric {
+    top: calc(50% + 118px);
+  }
+
+  .main-line::before {
+    left: -16px;
+  }
+
+  .controls {
+    padding: 20px;
+  }
+}
