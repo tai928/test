@@ -61,7 +61,7 @@ body {
   animation: kenburns 16s ease-in-out infinite alternate;
 }
 
-/* 画像がある場合はこれが使われる */
+/* 画像がある場合 */
 .scene-verse-1 {
   background-image:
     linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
@@ -644,7 +644,7 @@ body.chorus.beat .main-lyric {
 }
 
 /* ================================
-   CONTROLS
+   CONTROLS + PROGRESS
 ================================ */
 
 .controls {
@@ -653,15 +653,17 @@ body.chorus.beat .main-lyric {
   right: 0;
   bottom: 0;
   z-index: 20;
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
   padding: 28px 34px;
   pointer-events: none;
 }
 
 .play-button,
-.time {
+.time,
+.progress-wrap {
   pointer-events: auto;
 }
 
@@ -694,6 +696,38 @@ body.chorus.beat .main-lyric {
 .play-button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.progress-wrap {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(248, 248, 244, 0.16);
+  backdrop-filter: blur(12px);
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: rgba(248, 248, 244, 0.86);
+  box-shadow:
+    0 0 12px rgba(248, 248, 244, 0.35),
+    0 0 28px rgba(129, 179, 59, 0.20);
+  transition: width 0.08s linear;
+}
+
+body.chorus .progress-wrap {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+body.chorus .progress-bar {
+  background: linear-gradient(90deg, #ffffff, #d7f0a8, #4cb4ff);
+  box-shadow:
+    0 0 16px rgba(255, 255, 255, 0.55),
+    0 0 34px rgba(129, 179, 59, 0.35),
+    0 0 48px rgba(76, 180, 255, 0.22);
 }
 
 .time {
@@ -745,6 +779,17 @@ body.chorus.beat .main-lyric {
   }
 
   .controls {
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
     padding: 20px;
+  }
+
+  .play-button {
+    padding: 11px 17px;
+    font-size: 12px;
+  }
+
+  .time {
+    min-width: 72px;
   }
 }
