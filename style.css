@@ -7,7 +7,10 @@
   --white: #f8f8f4;
   --muted: rgba(248, 248, 244, 0.34);
   --muted-2: rgba(248, 248, 244, 0.16);
-  --accent: #d7f0a8;
+  --green: #81b33b;
+  --green-light: #d7f0a8;
+  --blue: #4cb4ff;
+  --yellow: #ffe678;
 }
 
 html,
@@ -38,16 +41,19 @@ body {
   background: #050505;
 }
 
-/* 背景シーン */
+/* ================================
+   BACKGROUND SCENES
+================================ */
+
 .scene {
   position: absolute;
-  inset: -3%;
+  inset: -4%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
   transform: scale(1.03);
-  filter: brightness(0.35) saturate(0.8);
+  filter: brightness(0.35) saturate(0.85);
   transition:
     opacity 1.1s ease,
     transform 6s ease,
@@ -55,37 +61,84 @@ body {
   animation: kenburns 16s ease-in-out infinite alternate;
 }
 
+/* 画像がある場合はこれが使われる */
+.scene-verse-1 {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
+    url("./assets/verse-1.jpg");
+}
+
+.scene-verse-2 {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
+    url("./assets/verse-2.jpg");
+}
+
+.scene-chorus {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05), rgba(255,255,255,0.05)),
+    url("./assets/chorus.jpg");
+}
+
+/* 画像が読み込めなくても最低限きれいに見える背景 */
+.scene-verse-1::before,
+.scene-verse-2::before,
+.scene-chorus::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.scene-verse-1::before {
+  background:
+    radial-gradient(circle at 22% 30%, rgba(255,255,255,0.06), transparent 22%),
+    radial-gradient(circle at 76% 70%, rgba(129,179,59,0.08), transparent 18%),
+    linear-gradient(135deg, #050505, #0b0b0b);
+}
+
+.scene-verse-2::before {
+  background:
+    radial-gradient(circle at 78% 28%, rgba(255,255,255,0.05), transparent 20%),
+    radial-gradient(circle at 30% 72%, rgba(76,180,255,0.07), transparent 18%),
+    linear-gradient(135deg, #030303, #0b0f10);
+}
+
+.scene-chorus::before {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,0.76), transparent 24%),
+    radial-gradient(circle at 30% 35%, rgba(129,179,59,0.38), transparent 24%),
+    radial-gradient(circle at 70% 35%, rgba(76,180,255,0.32), transparent 22%),
+    linear-gradient(135deg, rgba(255,255,255,0.65), rgba(218,255,185,0.35), rgba(170,230,255,0.35));
+}
+
 .scene.active {
   opacity: 1;
   transform: scale(1.08);
 }
 
-#sceneVerse1 {
-  background-image: url("./assets/verse-1.jpg");
+.scene-chorus {
+  filter: brightness(0.68) saturate(1.08);
 }
 
-#sceneVerse2 {
-  background-image: url("./assets/verse-2.jpg");
-}
-
-#sceneChorus {
-  background-image: url("./assets/chorus.jpg");
-}
-
-.chorus-scene {
-  filter: brightness(0.65) saturate(1.05);
+body.chorus .scene-chorus.active {
+  transform: scale(1.1);
+  filter: brightness(1.02) saturate(1.18);
 }
 
 @keyframes kenburns {
   from {
     background-position: 48% 46%;
   }
+
   to {
     background-position: 52% 54%;
   }
 }
 
-/* オーバーレイ */
+/* ================================
+   OVERLAYS
+================================ */
+
 .dark-overlay,
 .light-overlay,
 .noise,
@@ -98,30 +151,32 @@ body {
 }
 
 .dark-overlay {
-  z-index: 1;
+  z-index: 3;
   background:
     linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.44) 0%,
+      rgba(0, 0, 0, 0.52) 0%,
       rgba(0, 0, 0, 0.28) 45%,
-      rgba(0, 0, 0, 0.52) 100%
+      rgba(0, 0, 0, 0.58) 100%
     );
   transition: opacity 0.8s ease;
 }
 
 .light-overlay {
-  z-index: 2;
+  z-index: 4;
   opacity: 0.12;
   background:
     radial-gradient(circle at 50% 45%, rgba(255,255,255,0.09), transparent 30%),
     radial-gradient(circle at 70% 30%, rgba(215,240,168,0.08), transparent 20%);
-  transition: opacity 0.8s ease, filter 0.8s ease;
+  transition:
+    opacity 0.8s ease,
+    filter 0.8s ease;
   filter: blur(18px);
 }
 
 .noise {
-  z-index: 3;
-  opacity: 0.06;
+  z-index: 5;
+  opacity: 0.065;
   mix-blend-mode: soft-light;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -130,7 +185,7 @@ body {
 }
 
 .scanline {
-  z-index: 3;
+  z-index: 5;
   opacity: 0.14;
   background:
     repeating-linear-gradient(
@@ -143,17 +198,17 @@ body {
 }
 
 .vignette {
-  z-index: 4;
+  z-index: 6;
   background:
-    radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.34) 72%, rgba(0, 0, 0, 0.72) 100%);
+    radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.36) 72%, rgba(0, 0, 0, 0.74) 100%);
   transition: opacity 0.8s ease;
 }
 
 .chorus-flash {
-  z-index: 6;
+  z-index: 15;
   opacity: 0;
   background:
-    radial-gradient(circle at center, rgba(255,255,255,0.34), rgba(255,255,255,0.08) 34%, transparent 58%);
+    radial-gradient(circle at center, rgba(255,255,255,0.42), rgba(255,255,255,0.10) 34%, transparent 58%);
   mix-blend-mode: screen;
 }
 
@@ -162,16 +217,210 @@ body {
 }
 
 @keyframes chorusFlash {
-  0% { opacity: 0; }
-  18% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
-/* 歌詞 */
+/* ================================
+   CHORUS WORLD
+================================ */
+
+.chorus-world {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 0.5s ease;
+}
+
+body.chorus .chorus-world {
+  opacity: 1;
+}
+
+.chorus-gradient {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255,255,255,0.82), transparent 16%),
+    radial-gradient(circle at 30% 35%, rgba(129,179,59,0.55), transparent 22%),
+    radial-gradient(circle at 70% 35%, rgba(76,180,255,0.45), transparent 20%),
+    radial-gradient(circle at 50% 75%, rgba(255,230,120,0.30), transparent 24%),
+    linear-gradient(135deg, rgba(255,255,255,0.72), rgba(218,255,185,0.38), rgba(170,230,255,0.40));
+  filter: blur(26px) saturate(1.25);
+  opacity: 0.8;
+  transform: scale(1);
+}
+
+body.chorus .chorus-gradient {
+  animation: chorusBreath 3.8s ease-in-out infinite alternate;
+}
+
+@keyframes chorusBreath {
+  0% {
+    transform: scale(1);
+    filter: blur(30px) saturate(1.1) brightness(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+    filter: blur(18px) saturate(1.45) brightness(1.14);
+  }
+}
+
+/* 弾ける円 */
+.burst-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18vmin;
+  height: 18vmin;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.78);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.burst-ring::before,
+.burst-ring::after {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  border: 1px solid rgba(129,179,59,0.6);
+}
+
+.burst-ring::after {
+  inset: -32px;
+  border-color: rgba(76,180,255,0.42);
+}
+
+body.chorus-burst .ring-1 {
+  animation: ringBurst 1.2s cubic-bezier(.12,.8,.18,1) forwards;
+}
+
+body.chorus-burst .ring-2 {
+  animation: ringBurst 1.35s cubic-bezier(.12,.8,.18,1) 0.08s forwards;
+}
+
+body.chorus-burst .ring-3 {
+  animation: ringBurst 1.55s cubic-bezier(.12,.8,.18,1) 0.16s forwards;
+}
+
+@keyframes ringBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.06);
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(8.8);
+    opacity: 0;
+    filter: blur(0);
+  }
+}
+
+body.chorus-burst .chorus-flash {
+  animation: megaFlash 0.95s ease forwards;
+}
+
+@keyframes megaFlash {
+  0% {
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  38% {
+    opacity: 0.38;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 粒子 */
+.burst-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.burst-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 999px;
+  background: var(--color);
+  box-shadow:
+    0 0 12px var(--color),
+    0 0 28px rgba(255,255,255,0.28);
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--angle))
+    translateX(0)
+    scale(0.8);
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.burst-dot.active {
+  animation: dotBurst var(--duration) cubic-bezier(.11,.72,.2,1) forwards;
+}
+
+@keyframes dotBurst {
+  0% {
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angle))
+      translateX(0)
+      scale(0.7);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angle))
+      translateX(var(--distance))
+      scale(0.08);
+    opacity: 0;
+  }
+}
+
+/* ================================
+   LYRICS
+================================ */
+
 .lyrics {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 10;
   display: grid;
   place-items: center;
   padding: 10vh 9vw;
@@ -221,7 +470,9 @@ body {
   height: 1.3em;
   background: rgba(248, 248, 244, 0.42);
   box-shadow: 0 0 18px rgba(248, 248, 244, 0.14);
-  transition: background 0.4s ease, box-shadow 0.4s ease;
+  transition:
+    background 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .main-lyric {
@@ -239,7 +490,10 @@ body {
   text-shadow:
     0 0 10px rgba(255,255,255,0.06),
     0 0 26px rgba(255,255,255,0.02);
-  transition: text-shadow 0.5s ease, color 0.5s ease;
+  transition:
+    text-shadow 0.5s ease,
+    color 0.5s ease,
+    transform 0.2s ease;
 }
 
 .main-lyric::after {
@@ -255,8 +509,15 @@ body {
 }
 
 @keyframes caretBlink {
-  0%, 48% { opacity: 1; }
-  49%, 100% { opacity: 0; }
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  49%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .main-lyric.line-in {
@@ -274,6 +535,7 @@ body {
     filter: blur(7px);
     transform: translateY(12px);
   }
+
   100% {
     opacity: 1;
     filter: blur(0);
@@ -287,6 +549,7 @@ body {
     filter: blur(4px);
     transform: translateX(-50%) translateY(8px);
   }
+
   100% {
     opacity: 1;
     filter: blur(0);
@@ -294,13 +557,102 @@ body {
   }
 }
 
-/* 最小UI */
+/* ================================
+   CHORUS STYLE CHANGE
+================================ */
+
+body.chorus .dark-overlay {
+  opacity: 0.06;
+}
+
+body.chorus .light-overlay {
+  opacity: 0.48;
+  filter: blur(8px) brightness(1.25);
+}
+
+body.chorus .vignette {
+  opacity: 0.28;
+}
+
+body.chorus .noise {
+  opacity: 0.035;
+}
+
+body.chorus .main-line {
+  animation: chorusTextFloat 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes chorusTextFloat {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+body.chorus .main-line::before {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 0 18px rgba(255,255,255,0.35),
+    0 0 42px rgba(215,240,168,0.22);
+}
+
+body.chorus .main-lyric {
+  font-family:
+    "Hiragino Sans",
+    "Noto Sans JP",
+    "Yu Gothic",
+    sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  text-shadow:
+    0 0 16px rgba(255,255,255,0.65),
+    0 0 44px rgba(129,179,59,0.35),
+    0 0 92px rgba(76,180,255,0.25);
+}
+
+body.chorus .main-lyric::after {
+  background: #ffffff;
+  box-shadow:
+    0 0 16px rgba(255,255,255,0.8),
+    0 0 36px rgba(129,179,59,0.5);
+}
+
+body.chorus .prev-lyric {
+  color: rgba(255,255,255,0.28);
+}
+
+body.chorus .sub-lyric {
+  color: rgba(255,255,255,0.60);
+}
+
+/* ビート時 */
+body.beat .main-line::before {
+  background: rgba(215, 240, 168, 0.78);
+  box-shadow: 0 0 18px rgba(215, 240, 168, 0.16);
+}
+
+body.chorus.beat .chorus-gradient {
+  filter: blur(12px) saturate(1.65) brightness(1.25);
+}
+
+body.chorus.beat .main-lyric {
+  transform: scale(1.018);
+}
+
+/* ================================
+   CONTROLS
+================================ */
+
 .controls {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 7;
+  z-index: 20;
   display: flex;
   justify-content: space-between;
   align-items: end;
@@ -354,56 +706,6 @@ body {
   letter-spacing: 0.08em;
 }
 
-/* ビート時 */
-body.beat #sceneVerse1.active,
-body.beat #sceneVerse2.active {
-  transform: scale(1.09);
-  filter: brightness(0.42) saturate(0.88);
-}
-
-body.beat .main-line::before {
-  background: rgba(215, 240, 168, 0.78);
-  box-shadow: 0 0 18px rgba(215, 240, 168, 0.16);
-}
-
-/* サビで一気に明るく */
-body.chorus #sceneChorus.active {
-  transform: scale(1.1);
-  filter: brightness(0.98) saturate(1.15);
-}
-
-body.chorus .dark-overlay {
-  opacity: 0.18;
-}
-
-body.chorus .light-overlay {
-  opacity: 0.42;
-  filter: blur(8px) brightness(1.2);
-}
-
-body.chorus .vignette {
-  opacity: 0.45;
-}
-
-body.chorus .main-line::before {
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 0 18px rgba(255,255,255,0.22),
-    0 0 42px rgba(215,240,168,0.16);
-}
-
-body.chorus .main-lyric {
-  color: #ffffff;
-  text-shadow:
-    0 0 12px rgba(255,255,255,0.20),
-    0 0 34px rgba(255,255,255,0.14),
-    0 0 80px rgba(215,240,168,0.10);
-}
-
-body.chorus .sub-lyric {
-  color: rgba(255,255,255,0.54);
-}
-
 .hidden-media {
   position: absolute;
   width: 1px;
@@ -414,6 +716,10 @@ body.chorus .sub-lyric {
   opacity: 0;
   pointer-events: none;
 }
+
+/* ================================
+   RESPONSIVE
+================================ */
 
 @media (max-width: 760px) {
   .lyrics {
