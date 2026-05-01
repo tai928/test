@@ -419,8 +419,8 @@ function resetView() {
   progressBarEl.style.width = "0%";
 
   prevLyricEl.textContent = "";
-  mainLyricEl.textContent = ready ? "Press Play" : "Loading...";
-  subLyricEl.textContent = ready ? "lyrics will be typed here" : "";
+  mainLyricEl.textContent = ready ? "こたえて/imie" : "Loading...";
+  subLyricEl.textContent = ready ? " " : "";
 
   currentPhraseStart = null;
   previousPhraseText = "";
