@@ -1,6 +1,6 @@
 const { Player } = TextAliveApp;
 
-const SONG_URL = "https://piapro.jp/t/6W2N";
+const SONG_URL = "ttps://www.youtube.com/watch?v=ygY2qObZv24";
 
 // TextAlive App Token
 const APP_TOKEN = "IWGcvQmDMQHpO49o";
