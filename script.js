@@ -4,7 +4,7 @@ const { Player } = TextAliveApp;
   ここを対象曲URLに変更。
   マジカルミライコンテスト対象曲のURLを入れる。
 */
-const SONG_URL = "https://www.youtube.com/watch?v=ygY2qObZv24";
+const SONG_URL = "https://piapro.jp/t/6W2N/20251215164617";
 
 // TextAlive App Token
 const APP_TOKEN = "IWGcvQmDMQHpO49o";
