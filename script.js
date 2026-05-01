@@ -499,8 +499,8 @@ function setupPlayer() {
         }
       }
 
-      mainLyricEl.textContent = "Press Play";
-      subLyricEl.textContent = "lyrics will be typed here";
+      mainLyricEl.textContent = "こたえて/imie";
+      subLyricEl.textContent = " ";
       activateScene("verse1");
     },
 
