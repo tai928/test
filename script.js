@@ -10,7 +10,6 @@ const SONG_URL = "https://www.youtube.com/watch?v=ygY2qObZv24";
 const APP_TOKEN = "IWGcvQmDMQHpO49o";
 
 // サビ後半の図形・線エフェクト開始タイミング
-// サビに入ってから何秒後に丸・四角・リング・線を出すか
 const CHORUS_LATE_START_MS = 2000;
 
 const prevLyricEl = document.getElementById("prevLyric");
@@ -49,6 +48,9 @@ let lineSpawnTimer = null;
 
 let lastSceneName = "verse1";
 
+// TextAliveのphraseオブジェクトに直接プロパティを足さないためのMap
+const phraseOrderMap = new WeakMap();
+
 function formatTime(ms) {
   return `${(ms / 1000).toFixed(1)}s`;
 }
@@ -56,14 +58,13 @@ function formatTime(ms) {
 function getTypedText(text, progress) {
   const chars = Array.from(text || "");
   const clamped = Math.max(0, Math.min(1, progress));
-
   const adjusted = Math.min(1, clamped / 0.85);
   const count = Math.max(0, Math.ceil(chars.length * adjusted));
-
   return chars.slice(0, count).join("");
 }
 
 function restartAnimation(el, className) {
+  if (!el) return;
   el.classList.remove(className);
   void el.offsetWidth;
   el.classList.add(className);
@@ -71,18 +72,14 @@ function restartAnimation(el, className) {
 
 function updateSubLyric(text) {
   const nextText = text || "";
-
   if (subLyricEl.textContent === nextText) return;
-
   subLyricEl.textContent = nextText;
   restartAnimation(subLyricEl, "line-fade");
 }
 
 function updatePrevLyric(text) {
   const prevText = text || "";
-
   if (prevLyricEl.textContent === prevText) return;
-
   prevLyricEl.textContent = prevText;
   restartAnimation(prevLyricEl, "line-fade");
 }
@@ -90,24 +87,27 @@ function updatePrevLyric(text) {
 function activateScene(name) {
   if (lastSceneName === name) return;
 
-  sceneVerse1.classList.remove("active");
-  sceneVerse2.classList.remove("active");
-  sceneChorus.classList.remove("active");
+  sceneVerse1?.classList.remove("active");
+  sceneVerse2?.classList.remove("active");
+  sceneChorus?.classList.remove("active");
 
-  if (name === "verse1") sceneVerse1.classList.add("active");
-  if (name === "verse2") sceneVerse2.classList.add("active");
-  if (name === "chorus") sceneChorus.classList.add("active");
+  if (name === "verse1") sceneVerse1?.classList.add("active");
+  if (name === "verse2") sceneVerse2?.classList.add("active");
+  if (name === "chorus") sceneChorus?.classList.add("active");
 
   lastSceneName = name;
 }
 
 function triggerChorusFlash() {
+  if (!chorusFlashEl) return;
   chorusFlashEl.classList.remove("active");
   void chorusFlashEl.offsetWidth;
   chorusFlashEl.classList.add("active");
 }
 
 function createBurstParticles() {
+  if (!burstParticlesEl) return;
+
   burstParticlesEl.innerHTML = "";
 
   const colors = [
@@ -173,22 +173,10 @@ function createGeoShape({ burst = false } = {}) {
   const shape = document.createElement("span");
   shape.className = `geo-shape ${type}`;
 
-  const size = burst
-    ? 34 + Math.random() * 90
-    : 22 + Math.random() * 70;
-
-  const x = burst
-    ? 35 + Math.random() * 30
-    : 8 + Math.random() * 84;
-
-  const y = burst
-    ? 38 + Math.random() * 30
-    : 18 + Math.random() * 68;
-
-  const duration = burst
-    ? 1.0 + Math.random() * 0.8
-    : 2.8 + Math.random() * 2.4;
-
+  const size = burst ? 34 + Math.random() * 90 : 22 + Math.random() * 70;
+  const x = burst ? 35 + Math.random() * 30 : 8 + Math.random() * 84;
+  const y = burst ? 38 + Math.random() * 30 : 18 + Math.random() * 68;
+  const duration = burst ? 1.0 + Math.random() * 0.8 : 2.8 + Math.random() * 2.4;
   const spin = 4 + Math.random() * 8;
   const rot = Math.random() * 360;
 
@@ -208,9 +196,7 @@ function createGeoShape({ burst = false } = {}) {
 
 function spawnGeoWave(count = 10, burst = false) {
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      createGeoShape({ burst });
-    }, i * 45);
+    setTimeout(() => createGeoShape({ burst }), i * 45);
   }
 }
 
@@ -256,26 +242,11 @@ function createWiggleLine({ burst = false } = {}) {
     "rgba(255,230,120,0.90)"
   ];
 
-  const width = burst
-    ? 220 + Math.random() * 240
-    : 140 + Math.random() * 220;
-
-  const height = burst
-    ? 80 + Math.random() * 120
-    : 60 + Math.random() * 90;
-
-  const x = burst
-    ? 30 + Math.random() * 40
-    : 8 + Math.random() * 84;
-
-  const y = burst
-    ? 28 + Math.random() * 42
-    : 12 + Math.random() * 70;
-
-  const duration = burst
-    ? 1.4 + Math.random() * 0.8
-    : 2.3 + Math.random() * 1.8;
-
+  const width = burst ? 220 + Math.random() * 240 : 140 + Math.random() * 220;
+  const height = burst ? 80 + Math.random() * 120 : 60 + Math.random() * 90;
+  const x = burst ? 30 + Math.random() * 40 : 8 + Math.random() * 84;
+  const y = burst ? 28 + Math.random() * 42 : 12 + Math.random() * 70;
+  const duration = burst ? 1.4 + Math.random() * 0.8 : 2.3 + Math.random() * 1.8;
   const drawDuration = 0.35 + Math.random() * 0.35;
   const stroke = 1.6 + Math.random() * 1.8;
   const rot = -20 + Math.random() * 40;
@@ -311,9 +282,7 @@ function createWiggleLine({ burst = false } = {}) {
 
 function spawnWiggleWave(count = 4, burst = false) {
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      createWiggleLine({ burst });
-    }, i * 60);
+    setTimeout(() => createWiggleLine({ burst }), i * 60);
   }
 }
 
@@ -323,7 +292,6 @@ function startChorusLateEffects() {
   isChorusLateNow = true;
   document.body.classList.add("chorus-late");
 
-  // 後半に入った瞬間、多めに出す
   spawnGeoWave(24, true);
   spawnWiggleWave(8, true);
 
@@ -350,13 +318,8 @@ function stopChorusLateEffects() {
   clearInterval(lineSpawnTimer);
   lineSpawnTimer = null;
 
-  if (geometricLayerEl) {
-    geometricLayerEl.innerHTML = "";
-  }
-
-  if (lineLayerEl) {
-    lineLayerEl.innerHTML = "";
-  }
+  if (geometricLayerEl) geometricLayerEl.innerHTML = "";
+  if (lineLayerEl) lineLayerEl.innerHTML = "";
 }
 
 /* ================================
@@ -410,9 +373,8 @@ function onNewPhrase(phrase) {
 
   previousPhraseText = currentTypedSource;
 
-  // 通常パートだけ背景を交互に切り替える
   if (!isChorusNow) {
-    const order = phrase._order ?? 0;
+    const order = phraseOrderMap.get(phrase) || 0;
     activateScene(order % 2 === 0 ? "verse1" : "verse2");
   }
 }
@@ -431,6 +393,16 @@ function animatePhrase(now, phrase) {
   }
 
   mainLyricEl.textContent = getTypedText(currentTypedSource, progress);
+}
+
+/* 歌詞がPhraseで取れない曲用の最低限フォールバック */
+function animateWordFallback(now, word) {
+  if (!word.contains(now)) return;
+
+  const text = word.text || "";
+  if (!text) return;
+
+  mainLyricEl.textContent = text;
 }
 
 function triggerBeat() {
@@ -465,6 +437,37 @@ function resetView() {
   activateScene("verse1");
 }
 
+function setupPhraseAnimations() {
+  let phrase = player.video.firstPhrase;
+  let order = 0;
+
+  if (phrase) {
+    while (phrase) {
+      phraseOrderMap.set(phrase, order);
+      phrase.animate = animatePhrase;
+      phrase = phrase.next;
+      order += 1;
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+function setupWordFallbackAnimations() {
+  let word = player.video.firstWord;
+
+  if (!word) return false;
+
+  while (word) {
+    word.animate = animateWordFallback;
+    word = word.next;
+  }
+
+  return true;
+}
+
 function setupPlayer() {
   player = new Player({
     app: {
@@ -485,14 +488,16 @@ function setupPlayer() {
       ready = true;
       playButton.disabled = false;
 
-      let phrase = player.video.firstPhrase;
-      let order = 0;
+      const hasPhrase = setupPhraseAnimations();
 
-      while (phrase) {
-        phrase._order = order;
-        phrase.animate = animatePhrase;
-        phrase = phrase.next;
-        order += 1;
+      if (!hasPhrase) {
+        const hasWord = setupWordFallbackAnimations();
+
+        if (!hasWord) {
+          mainLyricEl.textContent = "歌詞データが取得できませんでした";
+          subLyricEl.textContent = "曲URLまたはTextAlive対応状況を確認してください";
+          return;
+        }
       }
 
       mainLyricEl.textContent = "Press Play";
@@ -522,7 +527,6 @@ function setupPlayer() {
         lastBeatIndex = beat.index;
         triggerBeat();
 
-        // サビ後半だけ、ビートに合わせて図形と線を追加
         if (isChorusLateNow) {
           spawnGeoWave(3, true);
           spawnWiggleWave(2, true);
