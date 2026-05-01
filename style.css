@@ -61,7 +61,6 @@ body {
   animation: kenburns 16s ease-in-out infinite alternate;
 }
 
-/* 画像がある場合 */
 .scene-verse-1 {
   background-image:
     linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
@@ -266,6 +265,21 @@ body.chorus .chorus-gradient {
   animation: chorusBreath 3.8s ease-in-out infinite alternate;
 }
 
+body.chorus-late .chorus-gradient {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255,255,255,0.88), transparent 16%),
+    radial-gradient(circle at 28% 34%, rgba(129,179,59,0.62), transparent 22%),
+    radial-gradient(circle at 72% 35%, rgba(76,180,255,0.52), transparent 20%),
+    radial-gradient(circle at 50% 75%, rgba(255,230,120,0.38), transparent 24%),
+    conic-gradient(
+      from 120deg at 50% 50%,
+      rgba(255,255,255,0.08),
+      rgba(129,179,59,0.14),
+      rgba(76,180,255,0.12),
+      rgba(255,255,255,0.08)
+    );
+}
+
 @keyframes chorusBreath {
   0% {
     transform: scale(1);
@@ -278,7 +292,7 @@ body.chorus .chorus-gradient {
   }
 }
 
-/* 弾ける円 */
+/* サビ突入の円爆発 */
 .burst-ring {
   position: absolute;
   left: 50%;
@@ -358,7 +372,7 @@ body.chorus-burst .chorus-flash {
   }
 }
 
-/* 粒子 */
+/* サビ突入の粒子 */
 .burst-particles {
   position: absolute;
   inset: 0;
@@ -411,6 +425,119 @@ body.chorus-burst .chorus-flash {
       scale(0.08);
     opacity: 0;
   }
+}
+
+/* ================================
+   CHORUS LATE GEOMETRIC EFFECTS
+================================ */
+
+.geometric-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+body.chorus-late .geometric-layer {
+  opacity: 1;
+}
+
+.geo-shape {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  opacity: 0;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--rot))
+    scale(0.5);
+  animation:
+    geoFloat var(--duration) ease-in-out forwards,
+    geoSpin var(--spin) linear infinite;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,0.28));
+}
+
+.geo-circle {
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.76);
+  background: rgba(255,255,255,0.08);
+}
+
+.geo-square {
+  border-radius: 8%;
+  border: 2px solid rgba(215,240,168,0.76);
+  background: rgba(129,179,59,0.08);
+}
+
+.geo-ring {
+  border-radius: 999px;
+  border: 3px solid rgba(76,180,255,0.72);
+  background: transparent;
+}
+
+.geo-ring::after {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.42);
+}
+
+.geo-diamond {
+  border-radius: 10%;
+  border: 2px solid rgba(255,230,120,0.76);
+  background: rgba(255,230,120,0.08);
+}
+
+@keyframes geoFloat {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translateY(30px)
+      rotate(var(--rot))
+      scale(0.35);
+    filter: blur(8px) drop-shadow(0 0 10px rgba(255,255,255,0.12));
+  }
+
+  14% {
+    opacity: 0.85;
+  }
+
+  70% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      translateY(-90px)
+      rotate(calc(var(--rot) + 90deg))
+      scale(1.28);
+    filter: blur(1px) drop-shadow(0 0 24px rgba(255,255,255,0.32));
+  }
+}
+
+@keyframes geoSpin {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+}
+
+body.chorus-late.beat .geo-shape {
+  filter:
+    brightness(1.35)
+    drop-shadow(0 0 18px rgba(255,255,255,0.42));
 }
 
 /* ================================
@@ -627,6 +754,13 @@ body.chorus .prev-lyric {
 
 body.chorus .sub-lyric {
   color: rgba(255,255,255,0.60);
+}
+
+body.chorus-late .main-lyric {
+  text-shadow:
+    0 0 18px rgba(255,255,255,0.72),
+    0 0 52px rgba(129,179,59,0.42),
+    0 0 110px rgba(76,180,255,0.32);
 }
 
 /* ビート時 */
