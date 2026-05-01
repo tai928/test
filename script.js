@@ -9,9 +9,9 @@ const SONG_URL = "https://www.youtube.com/watch?v=ygY2qObZv24";
 // TextAlive App Token
 const APP_TOKEN = "IWGcvQmDMQHpO49o";
 
-// サビ後半の図形エフェクト開始タイミング
-// サビに入ってから何秒後に丸・四角・リングを出すか
-const CHORUS_LATE_START_MS = 8000;
+// サビ後半の図形・線エフェクト開始タイミング
+// サビに入ってから何秒後に丸・四角・リング・線を出すか
+const CHORUS_LATE_START_MS = 2000;
 
 const prevLyricEl = document.getElementById("prevLyric");
 const mainLyricEl = document.getElementById("mainLyric");
@@ -25,6 +25,7 @@ const mediaEl = document.getElementById("media");
 const chorusFlashEl = document.getElementById("chorusFlash");
 const burstParticlesEl = document.getElementById("burstParticles");
 const geometricLayerEl = document.getElementById("geometricLayer");
+const lineLayerEl = document.getElementById("lineLayer");
 
 const sceneVerse1 = document.getElementById("sceneVerse1");
 const sceneVerse2 = document.getElementById("sceneVerse2");
@@ -44,6 +45,7 @@ let isChorusNow = false;
 let chorusStartPosition = null;
 let isChorusLateNow = false;
 let geoSpawnTimer = null;
+let lineSpawnTimer = null;
 
 let lastSceneName = "verse1";
 
@@ -55,7 +57,6 @@ function getTypedText(text, progress) {
   const chars = Array.from(text || "");
   const clamped = Math.max(0, Math.min(1, progress));
 
-  // 85%くらいで全文が出て、最後に少し余韻が残る
   const adjusted = Math.min(1, clamped / 0.85);
   const count = Math.max(0, Math.ceil(chars.length * adjusted));
 
@@ -213,6 +214,109 @@ function spawnGeoWave(count = 10, burst = false) {
   }
 }
 
+/* ================================
+   サビ後半のウニョウニョ線
+================================ */
+
+function makeWigglePath(width, height) {
+  const points = [];
+  const count = 6 + Math.floor(Math.random() * 3);
+
+  for (let i = 0; i < count; i++) {
+    const x = (width / (count - 1)) * i;
+    const y = height * (0.18 + Math.random() * 0.64);
+    points.push({ x, y });
+  }
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+
+    const cx1 = prev.x + (curr.x - prev.x) * 0.35;
+    const cy1 = prev.y + (Math.random() * height * 0.4 - height * 0.2);
+
+    const cx2 = prev.x + (curr.x - prev.x) * 0.75;
+    const cy2 = curr.y + (Math.random() * height * 0.4 - height * 0.2);
+
+    d += ` C ${cx1} ${cy1}, ${cx2} ${cy2}, ${curr.x} ${curr.y}`;
+  }
+
+  return d;
+}
+
+function createWiggleLine({ burst = false } = {}) {
+  if (!lineLayerEl) return;
+
+  const colors = [
+    "rgba(255,255,255,0.95)",
+    "rgba(129,179,59,0.95)",
+    "rgba(76,180,255,0.92)",
+    "rgba(255,230,120,0.90)"
+  ];
+
+  const width = burst
+    ? 220 + Math.random() * 240
+    : 140 + Math.random() * 220;
+
+  const height = burst
+    ? 80 + Math.random() * 120
+    : 60 + Math.random() * 90;
+
+  const x = burst
+    ? 30 + Math.random() * 40
+    : 8 + Math.random() * 84;
+
+  const y = burst
+    ? 28 + Math.random() * 42
+    : 12 + Math.random() * 70;
+
+  const duration = burst
+    ? 1.4 + Math.random() * 0.8
+    : 2.3 + Math.random() * 1.8;
+
+  const drawDuration = 0.35 + Math.random() * 0.35;
+  const stroke = 1.6 + Math.random() * 1.8;
+  const rot = -20 + Math.random() * 40;
+  const color = colors[Math.floor(Math.random() * colors.length)];
+
+  const wrap = document.createElement("div");
+  wrap.className = "wiggle-line";
+
+  wrap.style.setProperty("--x", `${x}%`);
+  wrap.style.setProperty("--y", `${y}%`);
+  wrap.style.setProperty("--w", `${width}px`);
+  wrap.style.setProperty("--h", `${height}px`);
+  wrap.style.setProperty("--rot", `${rot}deg`);
+  wrap.style.setProperty("--duration", `${duration}s`);
+  wrap.style.setProperty("--draw-duration", `${drawDuration}s`);
+  wrap.style.setProperty("--line-color", color);
+  wrap.style.setProperty("--stroke", `${stroke}px`);
+
+  const path = makeWigglePath(width, height);
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
+      <path d="${path}"></path>
+    </svg>
+  `;
+
+  lineLayerEl.appendChild(wrap);
+
+  setTimeout(() => {
+    wrap.remove();
+  }, duration * 1000 + 400);
+}
+
+function spawnWiggleWave(count = 4, burst = false) {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      createWiggleLine({ burst });
+    }, i * 60);
+  }
+}
+
 function startChorusLateEffects() {
   if (isChorusLateNow) return;
 
@@ -221,11 +325,17 @@ function startChorusLateEffects() {
 
   // 後半に入った瞬間、多めに出す
   spawnGeoWave(24, true);
+  spawnWiggleWave(8, true);
 
   clearInterval(geoSpawnTimer);
   geoSpawnTimer = setInterval(() => {
     spawnGeoWave(5, false);
   }, 650);
+
+  clearInterval(lineSpawnTimer);
+  lineSpawnTimer = setInterval(() => {
+    spawnWiggleWave(3, false);
+  }, 820);
 }
 
 function stopChorusLateEffects() {
@@ -237,8 +347,15 @@ function stopChorusLateEffects() {
   clearInterval(geoSpawnTimer);
   geoSpawnTimer = null;
 
+  clearInterval(lineSpawnTimer);
+  lineSpawnTimer = null;
+
   if (geometricLayerEl) {
     geometricLayerEl.innerHTML = "";
+  }
+
+  if (lineLayerEl) {
+    lineLayerEl.innerHTML = "";
   }
 }
 
@@ -405,9 +522,10 @@ function setupPlayer() {
         lastBeatIndex = beat.index;
         triggerBeat();
 
-        // サビ後半だけ、ビートに合わせて図形を追加
+        // サビ後半だけ、ビートに合わせて図形と線を追加
         if (isChorusLateNow) {
           spawnGeoWave(3, true);
+          spawnWiggleWave(2, true);
         }
       }
 
