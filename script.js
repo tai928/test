@@ -48,7 +48,6 @@ let lineSpawnTimer = null;
 
 let lastSceneName = "verse1";
 
-// TextAliveのphraseオブジェクトに直接プロパティを足さないためのMap
 const phraseOrderMap = new WeakMap();
 
 function formatTime(ms) {
