@@ -14,6 +14,8 @@ const mainLyricEl = document.getElementById("mainLyric");
 const subLyricEl = document.getElementById("subLyric");
 const playButton = document.getElementById("playButton");
 const timeEl = document.getElementById("time");
+const progressWrapEl = document.getElementById("progressWrap");
+const progressBarEl = document.getElementById("progressBar");
 const mediaEl = document.getElementById("media");
 
 const chorusFlashEl = document.getElementById("chorusFlash");
@@ -148,6 +150,34 @@ function triggerChorusBurst() {
   }, 1800);
 }
 
+function updateProgress(position) {
+  const duration = player?.video?.duration || 0;
+
+  if (!duration || duration <= 0) {
+    progressBarEl.style.width = "0%";
+    return;
+  }
+
+  const progress = Math.max(0, Math.min(1, position / duration));
+  progressBarEl.style.width = `${progress * 100}%`;
+}
+
+function seekFromProgress(event) {
+  if (!player || !ready) return;
+
+  const duration = player?.video?.duration || 0;
+  if (!duration || duration <= 0) return;
+
+  const rect = progressWrapEl.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const ratio = Math.max(0, Math.min(1, x / rect.width));
+  const target = duration * ratio;
+
+  player.requestMediaSeek(target);
+  updateProgress(target);
+  timeEl.textContent = formatTime(target);
+}
+
 function onNewPhrase(phrase) {
   updatePrevLyric(previousPhraseText);
 
@@ -198,6 +228,7 @@ function triggerBeat() {
 function resetView() {
   playButton.textContent = "Play";
   timeEl.textContent = "0.0s";
+  progressBarEl.style.width = "0%";
 
   prevLyricEl.textContent = "";
   mainLyricEl.textContent = ready ? "Press Play" : "Loading...";
@@ -265,6 +296,7 @@ function setupPlayer() {
 
     onTimeUpdate(position) {
       timeEl.textContent = formatTime(position);
+      updateProgress(position);
 
       const beat = player.findBeat(position);
 
@@ -306,5 +338,7 @@ playButton.addEventListener("click", () => {
     player.requestPlay();
   }
 });
+
+progressWrapEl.addEventListener("click", seekFromProgress);
 
 setupPlayer();
