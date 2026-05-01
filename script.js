@@ -9,6 +9,10 @@ const SONG_URL = "https://www.youtube.com/watch?v=ygY2qObZv24";
 // TextAlive App Token
 const APP_TOKEN = "IWGcvQmDMQHpO49o";
 
+// サビ後半の図形エフェクト開始タイミング
+// サビに入ってから何秒後に丸・四角・リングを出すか
+const CHORUS_LATE_START_MS = 8000;
+
 const prevLyricEl = document.getElementById("prevLyric");
 const mainLyricEl = document.getElementById("mainLyric");
 const subLyricEl = document.getElementById("subLyric");
@@ -20,6 +24,7 @@ const mediaEl = document.getElementById("media");
 
 const chorusFlashEl = document.getElementById("chorusFlash");
 const burstParticlesEl = document.getElementById("burstParticles");
+const geometricLayerEl = document.getElementById("geometricLayer");
 
 const sceneVerse1 = document.getElementById("sceneVerse1");
 const sceneVerse2 = document.getElementById("sceneVerse2");
@@ -36,6 +41,10 @@ let previousPhraseText = "";
 let currentTypedSource = "";
 
 let isChorusNow = false;
+let chorusStartPosition = null;
+let isChorusLateNow = false;
+let geoSpawnTimer = null;
+
 let lastSceneName = "verse1";
 
 function formatTime(ms) {
@@ -150,6 +159,93 @@ function triggerChorusBurst() {
   }, 1800);
 }
 
+/* ================================
+   サビ後半の丸・四角・リング
+================================ */
+
+function createGeoShape({ burst = false } = {}) {
+  if (!geometricLayerEl) return;
+
+  const types = ["geo-circle", "geo-square", "geo-ring", "geo-diamond"];
+  const type = types[Math.floor(Math.random() * types.length)];
+
+  const shape = document.createElement("span");
+  shape.className = `geo-shape ${type}`;
+
+  const size = burst
+    ? 34 + Math.random() * 90
+    : 22 + Math.random() * 70;
+
+  const x = burst
+    ? 35 + Math.random() * 30
+    : 8 + Math.random() * 84;
+
+  const y = burst
+    ? 38 + Math.random() * 30
+    : 18 + Math.random() * 68;
+
+  const duration = burst
+    ? 1.0 + Math.random() * 0.8
+    : 2.8 + Math.random() * 2.4;
+
+  const spin = 4 + Math.random() * 8;
+  const rot = Math.random() * 360;
+
+  shape.style.setProperty("--x", `${x}%`);
+  shape.style.setProperty("--y", `${y}%`);
+  shape.style.setProperty("--size", `${size}px`);
+  shape.style.setProperty("--duration", `${duration}s`);
+  shape.style.setProperty("--spin", `${spin}s`);
+  shape.style.setProperty("--rot", `${rot}deg`);
+
+  geometricLayerEl.appendChild(shape);
+
+  setTimeout(() => {
+    shape.remove();
+  }, duration * 1000 + 300);
+}
+
+function spawnGeoWave(count = 10, burst = false) {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      createGeoShape({ burst });
+    }, i * 45);
+  }
+}
+
+function startChorusLateEffects() {
+  if (isChorusLateNow) return;
+
+  isChorusLateNow = true;
+  document.body.classList.add("chorus-late");
+
+  // 後半に入った瞬間、多めに出す
+  spawnGeoWave(24, true);
+
+  clearInterval(geoSpawnTimer);
+  geoSpawnTimer = setInterval(() => {
+    spawnGeoWave(5, false);
+  }, 650);
+}
+
+function stopChorusLateEffects() {
+  isChorusLateNow = false;
+  chorusStartPosition = null;
+
+  document.body.classList.remove("chorus-late");
+
+  clearInterval(geoSpawnTimer);
+  geoSpawnTimer = null;
+
+  if (geometricLayerEl) {
+    geometricLayerEl.innerHTML = "";
+  }
+}
+
+/* ================================
+   再生バー
+================================ */
+
 function updateProgress(position) {
   const duration = player?.video?.duration || 0;
 
@@ -177,6 +273,10 @@ function seekFromProgress(event) {
   updateProgress(target);
   timeEl.textContent = formatTime(target);
 }
+
+/* ================================
+   歌詞
+================================ */
 
 function onNewPhrase(phrase) {
   updatePrevLyric(previousPhraseText);
@@ -244,6 +344,7 @@ function resetView() {
   document.body.classList.remove("chorus");
   document.body.classList.remove("chorus-burst");
 
+  stopChorusLateEffects();
   activateScene("verse1");
 }
 
@@ -303,24 +404,37 @@ function setupPlayer() {
       if (beat && beat.index !== lastBeatIndex) {
         lastBeatIndex = beat.index;
         triggerBeat();
+
+        // サビ後半だけ、ビートに合わせて図形を追加
+        if (isChorusLateNow) {
+          spawnGeoWave(3, true);
+        }
       }
 
       const chorus = player.findChorus(position);
 
       if (chorus && !isChorusNow) {
         isChorusNow = true;
+        chorusStartPosition = position;
 
         document.body.classList.add("chorus");
         activateScene("chorus");
 
         triggerChorusFlash();
         triggerChorusBurst();
+      } else if (chorus && isChorusNow) {
+        const chorusElapsed = position - chorusStartPosition;
+
+        if (chorusElapsed > CHORUS_LATE_START_MS) {
+          startChorusLateEffects();
+        }
       } else if (!chorus && isChorusNow) {
         isChorusNow = false;
 
         document.body.classList.remove("chorus");
         document.body.classList.remove("chorus-burst");
 
+        stopChorusLateEffects();
         activateScene("verse1");
       }
     },
